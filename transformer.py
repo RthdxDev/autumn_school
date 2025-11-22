@@ -53,7 +53,7 @@ class MultiHeadAttention(nn.Module):
 
 		attention_score = Q @ K.transpose(-2, -1) / (self.head_size ** 0.5)
 		out = self.softmax(attention_score) @ V
-		out = out.transpose(1, 2).contiguous().view(batch_size, seq_len, -1)
+		out = out.transpose(1, 2).reshape(batch_size, seq_len, -1)
 		out = self.linear(out)
 		out = self.dropout(out)
 
