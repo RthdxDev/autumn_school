@@ -37,19 +37,26 @@ class MultiHeadAttention(nn.Module):
 	"""
 	def __init__(self, emb_size, num_heads, head_size, dropout=0.0):
 		super().__init__()
-		self.heads = nn.ModuleList(
-			[
-				Head(emb_size=emb_size, head_size=head_size, dropout=dropout)
-				for _ in range(num_heads)
-			]
-		)
-		self.linear = nn.Linear(num_heads * head_size, emb_size)
+		self.head_size = head_size
+		self.query = nn.Linear(emb_size, num_heads * head_size, bias=False)
+		self.key = nn.Linear(emb_size, num_heads * head_size, bias=False)
+		self.value = nn.Linear(emb_size, num_heads * head_size, bias=False)
 		self.dropout = nn.Dropout(dropout)
+		self.softmax = nn.Softmax(dim=-1)
+		self.linear = nn.Linear(num_heads * head_size, emb_size)
 		
 	def forward(self, x):
-		out = torch.cat([head(x) for head in self.heads], dim=-1)
+		batch_size, seq_len, emb_size = x.shape
+		Q = self.query(x).view(batch_size, seq_len, -1, self.head_size).transpose(1, 2)
+		K = self.key(x).view(batch_size, seq_len, -1, self.head_size).transpose(1, 2)
+		V = self.value(x).view(batch_size, seq_len, -1, self.head_size).transpose(1, 2)
+
+		attention_score = Q @ K.transpose(-2, -1) / (self.head_size ** 0.5)
+		out = self.softmax(attention_score) @ V
+		out = out.transpose(1, 2).contiguous().view(batch_size, seq_len, -1)
 		out = self.linear(out)
 		out = self.dropout(out)
+
 		return out
 
 
