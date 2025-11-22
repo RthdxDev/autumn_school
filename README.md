@@ -14,3 +14,13 @@ Examples of generated names:
 - kinn
 - sob
 - ron
+- keryab
+- ilder
+- samen
+- hirbelranna
+- aliea
+- kere
+- aster
+- jenn
+- jaan
+- pena
