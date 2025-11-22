@@ -31,7 +31,7 @@ class Head(nn.Module):
 		return out
 
 
-class MultiHeadAttention(nn.Module):
+class SelfAttention(nn.Module):
 	"""
 	Multiple heads of self-attention in parallel
 	"""
@@ -85,7 +85,7 @@ class TransformerBlock(nn.Module):
 	"""
 	def __init__(self, emb_size, num_heads, head_size, hidden_size, dropout=0.0):
 		super().__init__()
-		self.attention = MultiHeadAttention(emb_size, num_heads, head_size, dropout)
+		self.attention = SelfAttention(emb_size, num_heads, head_size, dropout)
 		self.ffn = FeedForwardNetwork(emb_size, hidden_size, dropout)
 		self.norm1 = nn.LayerNorm(emb_size)
 		self.norm2 = nn.LayerNorm(emb_size)
