@@ -25,9 +25,8 @@ class SelfAttention(nn.Module):
 
 		attention_score = Q @ K.transpose(-2, -1) / (self.head_size ** 0.5)
 
-		if self.training:
-			mask = torch.tril(torch.ones(seq_len, seq_len)).to(x.device)
-			attention_score = attention_score.masked_fill(mask == 0, float('-inf'))
+		mask = torch.tril(torch.ones(seq_len, seq_len)).to(x.device)
+		attention_score = attention_score.masked_fill(mask == 0, float('-inf'))
 
 		out = self.softmax(attention_score) @ V
 		out = out.transpose(1, 2).reshape(batch_size, seq_len, -1)
@@ -78,6 +77,7 @@ class TransformerBlock(nn.Module):
 class GPT(nn.Module):
 	def __init__(self, dict_size, emb_size, seq_len, num_heads=8, head_size=64, hidden_size=2048, dropout=0.3):
 		super().__init__()
+		self.max_len = seq_len
 		self.token_embedding_table = nn.Embedding(num_embeddings=dict_size, embedding_dim=emb_size)
 		self.blocks = nn.Sequential(
 			*[
@@ -110,9 +110,8 @@ class GPT(nn.Module):
 
 	@torch.no_grad()
 	def generate(self, idx, num_tokens=1):
-		_, seq_len = idx.shape
 		for _ in range(num_tokens):
-			idx_crop = idx if idx.shape[1] <= seq_len else idx[:, -seq_len:]
+			idx_crop = idx if idx.shape[1] <= self.max_len else idx[:, -self.max_len:]
 
 			logits = self.forward(idx_crop)[:, -1, :]
 			probs = F.softmax(logits, dim=-1)
