@@ -2,7 +2,7 @@
 
 A from-scratch implementation and systematic comparison of Transformer architectures, exploring Encoder-Decoder vs Decoder-only models with various architectural choices.
 
-## 📋 Overview
+## Overview
 
 This project pursues three main objectives:
 
@@ -90,7 +90,7 @@ deyr, onsist, hamaiel, motes
 Искал команлице,—
 ```
 
-## 👥 Authors
+## Authors
 
 - **Tarasov M.**
 - **Mustashkin A.**
